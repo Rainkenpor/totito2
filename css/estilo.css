@@ -1,0 +1,35 @@
+html{
+
+}
+body{
+	margin:0px;
+	padding: 0px;
+	background-image: url('../src/image/fondo.jpg');
+	background-size: cover;
+	background-repeat: no-repeat;
+	background-attachment: fixed;
+}
+
+.table-totito{
+	width:500px;
+}
+.table-totito td{
+	text-align: center;
+	vertical-align: middle;
+	height: 150px;
+	width: 90px;
+}
+
+.table-totito:not(.bloqueo) td:not(.bloqueo):hover{
+	background-color:#66BB6A;
+}
+
+.table-totito td span{
+	font-size: 40px;
+}
+.table-totito td:not(:nth-last-child(1)){
+	border-right:3px solid #ccc;
+}
+.table-totito tr:not(:nth-last-child(1)){
+	border-bottom:3px solid #ccc;
+}
