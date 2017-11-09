@@ -1,25 +1,42 @@
 var turno=1
 $(document).ready(function() {
   // posiciones de ubicacion
-  crear_partida(function(id){
-    $('.table-totito td').click(function(event) {
-      if (!$(this).hasClass('bloqueo')){
-        $(this).attr({turno:turno});
-        if (turno==1){
-          $(this).html('<span class=" icon-cancel" ></span>');
-          turno=2;
-        }else{
-          $(this).html('<span class="icon-circle-empty"></span>');
-          turno=1;
+  $('.table-totito td').addClass('bloqueo');
+  $('#button-iniciar').click(function(){
+    $('.table-totito td').removeClass('bloqueo');
+    $('.table-totito').removeClass('bloqueo');
+    crear_partida(function(id){
+      $('.table-totito td').click(function(event) {
+        if (!$(this).hasClass('bloqueo')){
+          $(this).attr({turno:turno});
+          movimiento_partida(id,$(this).attr('posicion'),turno);
+          if (turno==1){
+            $(this).html('<span class=" icon-cancel" ></span>');
+            turno=2;
+          }else{
+            $(this).html('<span class="icon-circle-empty"></span>');
+            turno=1;
+          }
+          $(this).addClass('bloqueo');
+
+          // validando_ganador();
         }
-        $(this).addClass('bloqueo');
-        movimiento_partida(id,0,turno);
-        validando_ganador();
-      }
+      });
     });
   });
-
 });
+
+function crear_partida(respuesta){
+  $.ajax({
+    url: 'include/server.php',
+    type: 'POST',
+    dataType: 'json',
+    data: {opcion: 'crear_partida'},
+    success(data){
+      respuesta(data);
+    }
+  });
+}
 
 function movimiento_partida(id,posicion,turno){
   $.ajax({
@@ -29,18 +46,6 @@ function movimiento_partida(id,posicion,turno){
     data: {opcion: 'movimiento_partida',id:id,posicion:posicion,turno:turno},
     success(data){
       console.log(data);
-    }
-  });
-
-}
-function crear_partida(respuesta){
-  $.ajax({
-    url: 'include/server.php',
-    type: 'POST',
-    dataType: 'json',
-    data: {opcion: 'crear_partida'},
-    success(data){
-      respuesta(data);
     }
   });
 
