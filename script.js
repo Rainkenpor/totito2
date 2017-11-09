@@ -2,12 +2,13 @@ var turno=1
 $(document).ready(function() {
   // posiciones de ubicacion
   $('.table-totito td').addClass('bloqueo');
-  $('#button-iniciar').click(function(){
+  $('#button-iniciar').click(function(){location.reload()});
+    // if ($(this).attr('tipo')==1){$(this).attr({'tipo':2});$(this).html("Refrescar");}else{;$('#button-iniciar').click()}
     $('.table-totito td').removeClass('bloqueo');
     $('.table-totito').removeClass('bloqueo');
     crear_partida(function(id){
       $('.table-totito td').click(function(event) {
-        if (!$(this).hasClass('bloqueo')){
+        if (!$(this).hasClass('bloqueo') && !$('.table-totito').hasClass('bloqueo')  ){
           $(this).attr({turno:turno});
           movimiento_partida(id,$(this).attr('posicion'),turno);
           if (turno==1){
@@ -23,7 +24,7 @@ $(document).ready(function() {
         }
       });
     });
-  });
+
 });
 
 function crear_partida(respuesta){
@@ -33,6 +34,7 @@ function crear_partida(respuesta){
     dataType: 'json',
     data: {opcion: 'crear_partida'},
     success(data){
+      console.log(data);
       respuesta(data);
     }
   });
@@ -46,40 +48,52 @@ function movimiento_partida(id,posicion,turno){
     data: {opcion: 'movimiento_partida',id:id,posicion:posicion,turno:turno},
     success(data){
       console.log(data);
-    }
-  });
-
-}
-
-validar=[[1,2,3],[4,5,6],[7,8,9],[1,5,9],[3,5,7],[1,4,7],[2,5,8],[3,6,9]];
-console.log(validar);
-
-function validando_ganador(){
-  console.log('----');
-  var array=[];
-    $('.table-totito tr').each(function(index, el) {
-    $(this).children('td').each(function(index2, el2) {
-      posicion=((index*3)+(index2+1));
-      // console.log(posicion+'--'+ $(el2).attr('turno'));
-      if ($(el2).attr('turno')>0) array.push({posicion:posicion,turno:$(el2).attr('turno')});
-    });
-  });
-  // console.log(array);
-  probabilidad(array);
-}
-
-function probabilidad(array){
-  var listado=[];
-  for (var y = 0; y < array.length; y++) {
-    console.log(array[y].turno);
-    for (var i = 0; i < validar.length; i++) {
-      posiciones=validar[i];
-      for (var t = 0; t < posiciones.length; t++) {
-        if(posiciones[t]==array[y].posicion){
-            console.log(validar[i]);
-            listado.push({turno:array[y].turno,lista:i});
-        }
+      $('#log').html('');
+      if (data.ganador>0){
+        $('#log').append('<div class="alert alert-success">Ganador Jugador: '+data.ganador+'</div>');
+        $('.table-totito').addClass('bloqueo');
+      }else{
+        if (turno==1) analizador(data.contricante,data.movimientos,data.viables,data.disponibles);
       }
+      // if (data.opciones)  $('#log').append('<hr><p>Opciones</p>'+data.opciones.join('<br>'));
+      if (data.contricante)  $('#log').append('<hr><p>Contricante</p>'+data.contricante.join('<br>'));
+      if (data.movimientos)  $('#log').append('<hr><p>Movimientos</p>'+data.movimientos.join('<br>'));
+      if (data.viables)  $('#log').append('<hr><p>Viables</p>'+data.viables.join('<br>'));
+      if (data.disponibles)  $('#log').append('<hr><p>Disponibles</p>'+data.disponibles.join('<br>'));
+
+
+
+      console.log(data);
     }
+  });
+}
+
+function analizador(contrincante,movimientos,viables,disponibles){
+  // aleatorio
+  if (movimientos){
+    console.log('encontrado movimiento');
+    var max=movimientos.length;var aleatorio= Math.floor(Math.random() * (max));
+    $('.table-totito td[posicion="'+movimientos[aleatorio]+'"]').click();
+    return false;
+  }
+  if (contrincante){
+    console.log('encontrado contrincante');
+    console.log(contrincante.length);
+    var max=contrincante.length;var aleatorio= Math.floor(Math.random() * (max));
+    $('.table-totito td[posicion="'+contrincante[aleatorio]+'"]').click();
+    return false;
+  }
+
+  if (viables){
+    console.log('encontrado viable');
+    var max=viables.length;var aleatorio= Math.floor(Math.random() * (max));
+    $('.table-totito td[posicion="'+viables[aleatorio]+'"]').click();
+    return false;
+  }
+  if (disponibles){
+      console.log('encontrado disponible');
+      var max=disponibles.length;var aleatorio= Math.floor(Math.random() * (max));
+      $('.table-totito td[posicion="'+disponibles[aleatorio]+'"]').click();
+      return false;
   }
 }
